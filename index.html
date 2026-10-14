@@ -1,409 +1,231 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tu Tiên Giới</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#101322;color:#f2f2ff;font-family:Arial,sans-serif}
-header{padding:18px 14px;text-align:center;background:linear-gradient(135deg,#28204d,#103a49);border-bottom:1px solid #665ba5}
-h1{margin:0 0 6px;color:#ffe6a1;font-size:25px}
-small{color:#c8c8e8}
-main{max-width:760px;margin:auto;padding:12px}
-.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.panel{background:#1b2035;border:1px solid #343d60;border-radius:12px;padding:12px;margin-bottom:10px}
-.stat{background:#222943;padding:10px;border-radius:8px}
-.stat b{display:block;color:#9de7ff;margin-bottom:4px}
-button{background:#35305e;color:white;border:1px solid #7067ad;border-radius:8px;padding:10px;margin:3px;cursor:pointer}
-button:disabled{opacity:.4}
-.tabs{display:flex;flex-wrap:wrap;gap:4px;margin:10px 0}
-.tabs button{flex:1;min-width:90px}
-.active{background:#8a5cf6}
-h2{font-size:18px;color:#ffe6a1;margin:0 0 10px}
-p{line-height:1.5}
-.bar{height:10px;background:#080b14;border-radius:9px;overflow:hidden;margin:6px 0}
-.fill{height:100%;background:linear-gradient(90deg,#42d7b2,#75a7ff);width:0}
-#log{white-space:pre-line;max-height:180px;overflow:auto;color:#c8d7ff;font-size:13px}
-.item{padding:8px 0;border-bottom:1px solid #343d60}
-footer{text-align:center;color:#8c91b2;font-size:12px;padding:12px}
+body{margin:0;background:#0b1020;color:#eee;font:16px Arial}
+header{text-align:center;padding:18px;color:#ffd166;background:#171e35}
+main{max-width:700px;margin:auto;padding:12px}
+section{background:#171e35;padding:14px;margin:10px 0;border:1px solid #38466b;border-radius:12px}
+h2{color:#ffd166;font-size:19px}
+button{background:#344777;color:white;border:1px solid #657db5;border-radius:8px;padding:10px;margin:3px;font-weight:bold}
+button:active{background:#7658bb}
+.stat{display:inline-block;background:#0b1227;padding:9px;margin:3px;border-radius:8px}
+#log{background:#0b1227;padding:10px;border-radius:8px;max-height:200px;overflow:auto}
+.bar{height:10px;background:#080d19;border-radius:10px;margin:8px 0}
+.bar span{display:block;height:100%;background:#5bd6c0;border-radius:10px}
+.hidden{display:none}
 </style>
 </head>
 <body>
 <header>
 <h1>☯ TU TIÊN GIỚI ☯</h1>
-<small>Tu luyện • Săn yêu • Luyện khí • Bí cảnh</small>
+<div id="realm">Luyện Khí tầng 1 · Tiên</div>
 </header>
-
 <main>
-<section class="panel">
-<div class="stats">
-<div class="stat"><b>Tu vi</b><span id="qi">0</span> linh khí</div>
-<div class="stat"><b>Cảnh giới</b><span id="realm">Luyện Khí 1</span></div>
-<div class="stat"><b>HP</b><span id="hp">100/100</span></div>
-<div class="stat"><b>Linh thạch</b><span id="stones">100</span></div>
-<div class="stat"><b>Chủng tộc</b><span id="race">Chưa chọn</span></div>
-<div class="stat"><b>Cấp tu luyện</b><span id="level">1</span></div>
-</div>
-<p>Tiến độ đột phá: <span id="progress">0%</span></p>
-<div class="bar"><div class="fill" id="bar"></div></div>
+<section>
+<h2>🧘 Nhân vật</h2>
+<div style="font-size:60px;text-align:center" id="avatar">🧘</div>
+<div id="stats"></div>
+<p>HP: <span id="hpText"></span></p>
+<div class="bar"><span id="hpBar"></span></div>
+<p>Linh khí: <span id="qiText"></span></p>
+<div class="bar"><span id="qiBar"></span></div>
+<button onclick="cultivate()">🧘 Tu luyện +1 linh khí</button>
+<button onclick="toggleAuto()">Tự tu: <span id="autoText"></span></button>
+<button onclick="save()">💾 Lưu game</button>
 </section>
 
-<div class="tabs">
-<button onclick="tab('home')">Tu luyện</button>
-<button onclick="tab('hunt')">Săn yêu</button>
-<button onclick="tab('bag')">Túi đồ</button>
-<button onclick="tab('smith')">Luyện khí</button>
-<button onclick="tab('shop')">Cửa hàng</button>
-<button onclick="tab('dungeon')">Bí cảnh</button>
-</div>
+<section>
+<h2>☯ Đột phá cảnh giới</h2>
+<p id="breakInfo"></p>
+<button onclick="breakthrough()">Thử đột phá</button>
+</section>
 
-<div id="view"></div>
+<section>
+<h2>⭐ Tiềm năng</h2>
+<p>Mỗi lần lên tầng nhận 3 điểm. Mỗi điểm tăng +5 chỉ số.</p>
+<p>Điểm còn: <b id="potential"></b></p>
+<button onclick="spend('atk')">+5 Công kích</button>
+<button onclick="spend('def')">+5 Phòng thủ</button>
+<button onclick="spend('maxHp')">+5 HP tối đa</button>
+<button onclick="spend('spd')">+5 Tốc độ</button>
+<button onclick="spend('luck')">+5 May mắn</button>
+</section>
 
-<section class="panel">
+<section>
+<h2>🐺 Săn yêu thú</h2>
+<div id="mobs"></div>
+</section>
+
+<section>
+<h2>🏯 Bí cảnh 15 tầng</h2>
+<p id="dungeonInfo">Chưa vào bí cảnh.</p>
+<button onclick="enterDungeon()">Vào bí cảnh</button>
+<button onclick="fightDungeon()">Đánh quái / boss</button>
+<button onclick="leaveDungeon()">Rời bí cảnh</button>
+</section>
+
+<section>
+<h2>🎭 Tạo hình</h2>
+<label>Tên: <input id="nameInput" placeholder="Tên nhân vật"></label>
+<p>Đạo thống:</p>
+<button onclick="faction('Tiên')">🔵 Tiên</button>
+<button onclick="faction('Ma')">🟣 Ma</button>
+<p>Giới tính:</p>
+<button onclick="setGender('Nam')">Nam</button>
+<button onclick="setGender('Nữ')">Nữ</button>
+<p>Màu linh khí:</p>
+<button onclick="setAura('#67d4ff')">Xanh</button>
+<button onclick="setAura('#c59aff')">Tím</button>
+<button onclick="setAura('#ffd166')">Vàng</button>
+<button onclick="customize()">Lưu tạo hình</button>
+</section>
+
+<section>
 <h2>📜 Nhật ký</h2>
-<div id="log">Chào mừng đến Tu Tiên Giới! Chọn chủng tộc để bắt đầu.</div>
+<div id="log">Chào mừng đạo hữu!</div>
 </section>
-<footer>Bản thử nghiệm chạy trên trình duyệt. Dữ liệu lưu trên thiết bị này.</footer>
 </main>
 
 <script>
-const $=id=>document.getElementById(id);
-
-let s={
-qi:0,level:1,race:'',hp:100,maxHp:100,stones:100,
-iron:0,blackIron:0,star:0,gem:0,
-frags:[0,0,0,0],gear:[],floor:1,lastHunt:0
+const defaults={
+ name:"Đạo hữu",faction:"Tiên",gender:"Nam",level:1,realm:0,
+ qi:0,coins:100,potential:0,auto:false,aura:"#67d4ff",
+ base:{atk:15,def:10,maxHp:140,spd:5,luck:0},
+ hp:140,floor:0,enemyHp:0
 };
-
-const slots=['Kiếm','Vòng tay','Nhẫn','Áo choàng','Mũ','Quần'];
-const rarities=[
-['Trắng',1,50],['Lục',1.25,100],
-['Lam',1.5,200],['Tím',1.75,500],['Vàng',2,1000]
-];
-
-function save(){
-localStorage.setItem('tutien-save',JSON.stringify(s));
-}
-
-function load(){
+let g;
 try{
-let d=JSON.parse(localStorage.getItem('tutien-save'));
-if(d)s={...s,...d};
-}catch(e){}
-}
-
-function log(t){
-$('log').textContent=t+'\n'+$('log').textContent;
-}
-
-function qiCost(l=s.level){
-return Math.ceil(100*Math.pow(1.35,l-1));
-}
-
-function realmName(){
-let n=s.level-1;
-let major=Math.floor(n/10);
-let minor=n%10+1;
-let names=[
-'Luyện Khí','Trúc Cơ','Kim Đan','Nguyên Anh',
-'Hóa Thần','Luyện Hư','Hợp Thể','Đại Thừa',
-'Độ Kiếp','Chân Tiên'
+ g=Object.assign({},defaults,JSON.parse(localStorage.getItem("tuTienGame")||"{}"));
+ g.base=Object.assign({},defaults.base,g.base||{});
+}catch(e){g=JSON.parse(JSON.stringify(defaults))}
+let logs=[];
+const realms=["Luyện Khí","Trúc Cơ","Kim Đan","Nguyên Anh","Hóa Thần","Luyện Hư","Hợp Thể","Đại Thừa","Độ Kiếp"];
+const mobs=[
+ {name:"🐇 Thỏ linh",hp:35,atk:5,qi:18,coin:8},
+ {name:"🐺 Lang yêu",hp:65,atk:10,qi:35,coin:15},
+ {name:"🐯 Hổ yêu",hp:100,atk:16,qi:55,coin:25},
+ {name:"🐍 Xà yêu",hp:150,atk:22,qi:80,coin:40}
 ];
-return names[Math.min(major,9)]+' '+minor;
+function cost(){return Math.ceil(100*Math.pow(1.35,g.level-1))}
+function stats(){return {...g.base}}
+function log(s){
+ logs.unshift(s);
+ logs=logs.slice(0,15);
+ document.getElementById("log").innerHTML=logs.map(x=>"<p>"+x+"</p>").join("");
 }
-
-function renderStats(){
-$('qi').textContent=Math.floor(s.qi);
-$('realm').textContent=realmName();
-$('hp').textContent=s.hp+'/'+s.maxHp;
-$('stones').textContent=s.stones;
-$('race').textContent=s.race||'Chưa chọn';
-$('level').textContent=s.level;
-let pct=Math.min(100,s.qi/qiCost()*100);
-$('progress').textContent=pct.toFixed(0)+'%';
-$('bar').style.width=pct+'%';
+function render(){
+ let s=stats();
+ document.getElementById("realm").textContent=realms[Math.min(g.realm,8)]+" tầng "+g.level+" · "+g.faction;
+ document.getElementById("stats").innerHTML=
+ `<div class="stat">⚔️ Công: <b>${s.atk}</b></div>
+ <div class="stat">🛡️ Thủ: <b>${s.def}</b></div>
+ <div class="stat">💨 Tốc: <b>${s.spd}</b></div>
+ <div class="stat">❤️ HP tối đa: <b>${s.maxHp}</b></div>
+ <div class="stat">🍀 May: <b>${s.luck}</b></div>
+ <div class="stat">💰 Linh thạch: <b>${g.coins}</b></div>`;
+ document.getElementById("hpText").textContent=g.hp+"/"+s.maxHp;
+ document.getElementById("hpBar").style.width=Math.max(0,g.hp/s.maxHp*100)+"%";
+ document.getElementById("qiText").textContent=Math.floor(g.qi)+"/"+cost();
+ document.getElementById("qiBar").style.width=Math.min(100,g.qi/cost()*100)+"%";
+ document.getElementById("potential").textContent=g.potential;
+ document.getElementById("breakInfo").textContent="Cần "+cost()+" linh khí. Hiện có "+Math.floor(g.qi)+".";
+ document.getElementById("autoText").textContent=g.auto?"BẬT":"TẮT";
+ document.getElementById("avatar").style.color=g.aura;
+ document.getElementById("mobs").innerHTML=mobs.map((m,i)=>
+ `<p>${m.name} · HP ${m.hp} · Công ${m.atk}
+ <button onclick="hunt(${i})">Săn</button></p>`).join("");
+ document.getElementById("dungeonInfo").textContent=g.floor?
+ "Tầng "+g.floor+"/15 · HP quái "+g.enemyHp+(g.floor%5===0?" · BOSS":""):
+ "Chưa vào bí cảnh.";
 }
-
-function tab(name){
-document.querySelectorAll('.tabs button').forEach(b=>
-b.classList.toggle('active',
-({'home':'Tu luyện','hunt':'Săn yêu','bag':'Túi đồ',
-'smith':'Luyện khí','shop':'Cửa hàng','dungeon':'Bí cảnh'})[name]===b.textContent));
-
-let html='';
-
-if(name==='home'){
-html=`
-<section class="panel">
-<h2>🌌 Tu luyện</h2>
-<p>Mỗi giây tự động nhận 1 linh khí. Đủ linh khí thì có thể đột phá.</p>
-<button onclick="meditate()">Vận công (+10 linh khí)</button>
-<button onclick="breakthrough()">Đột phá (cần ${qiCost()})</button>
-<h2>Chọn đường tu</h2>
-<button onclick="chooseRace('Tiên')">Tu Tiên</button>
-<button onclick="chooseRace('Ma')">Tu Ma</button>
-</section>`;
+function cultivate(){g.qi++;render()}
+function toggleAuto(){g.auto=!g.auto;save();render()}
+setInterval(()=>{if(g.auto){g.qi++;render()}},1000);
+function save(){
+ localStorage.setItem("tuTienGame",JSON.stringify(g));
+ log("Đã lưu tiến độ trên thiết bị.");
 }
-
-if(name==='hunt'){
-let wait=Math.max(0,30-Math.floor((Date.now()-s.lastHunt)/1000));
-html=`
-<section class="panel">
-<h2>🐺 Săn yêu</h2>
-<p>Săn yêu có cơ hội nhận một trong bốn loại mảnh rương. Hồi chiêu 30 giây.</p>
-<button onclick="hunt()" ${wait?'disabled':''}>
-${wait?'Chờ '+wait+' giây':'Bắt đầu săn'}
-</button>
-<p>Mảnh rương: ${s.frags.map((v,i)=>
-['Hỏa','Băng','Lôi','Phong'][i]+': '+v).join(' · ')}</p>
-<button onclick="craftChest()">Ghép 10 mảnh cùng loại thành rương</button>
-</section>`;
-}
-
-if(name==='bag'){
-html=`
-<section class="panel">
-<h2>🎒 Túi đồ</h2>
-<p>Hắc Thiết: ${s.iron} · Huyền Thiết: ${s.blackIron}</p>
-<p>Sao May Mắn: ${s.star} · Bảo Thạch: ${s.gem}</p>
-<h2>Trang bị</h2>
-${slots.map((x,i)=>`
-<div class="item">${x}: ${s.gear[i]?gearText(s.gear[i]):'Chưa có'}
-${s.gear[i]?`<button onclick="enhance(${i})">Cường hóa</button>`:
-`<button onclick="buyGear(${i})">Mua trang bị</button>`}
-</div>`).join('')}
-</section>`;
-}
-
-if(name==='smith'){
-html=`
-<section class="panel">
-<h2>⚒️ Luyện khí</h2>
-<p>Hắc Thiết: ${s.iron} · Huyền Thiết: ${s.blackIron}</p>
-<p>Sao May Mắn tăng 5% tỉ lệ thành công. Bảo Thạch bảo vệ cấp trang bị khi thất bại.</p>
-<button onclick="buyMat('iron')">5 Hắc Thiết — 15 linh thạch</button>
-<button onclick="buyMat('blackIron')">5 Huyền Thiết — 30 linh thạch</button>
-<button onclick="buyMat('star')">Sao May Mắn — 100 linh thạch</button>
-<button onclick="buyMat('gem')">Bảo Thạch — 150 linh thạch</button>
-</section>`;
-}
-
-if(name==='shop'){
-html=`
-<section class="panel">
-<h2>🏮 Cửa hàng</h2>
-<p>Chọn ô trang bị muốn mua trong mục Túi đồ.</p>
-${rarities.map(r=>`<div class="item">${r[0]} phẩm — ${r[2]} linh thạch</div>`).join('')}
-<p>Đây là cửa hàng thử nghiệm.</p>
-</section>`;
-}
-
-if(name==='dungeon'){
-html=`
-<section class="panel">
-<h2>🏯 Bí cảnh tầng ${s.floor}/15</h2>
-<p>Tầng 5, 10, 15 có Boss. Thắng sẽ nhận vật liệu và linh thạch.</p>
-<button onclick="fightDungeon()">Đánh quái tầng ${s.floor}</button>
-<button onclick="leaveDungeon()">Rời bí cảnh</button>
-</section>`;
-}
-
-$('view').innerHTML=html;
-}
-
-function chooseRace(r){
-if(s.race)return log('Bạn đã chọn '+s.race+' rồi.');
-s.race=r;
-s.maxHp=r==='Tiên'?140:130;
-s.hp=s.maxHp;
-log('Bạn đã chọn con đường '+r+'!');
-refresh();
-}
-
-function meditate(){
-s.qi+=10;
-refresh();
-}
-
 function breakthrough(){
-let cost=qiCost();
-if(s.qi<cost)return log('Chưa đủ linh khí! Cần '+cost+'.');
-
-let stage=(s.level-1)%10+1;
-let chance=stage<=3?.05:stage<=6?.15:stage<=9?.3:.4;
-
-s.qi-=cost;
-
-if(Math.random()<chance){
-s.level++;
-log('Đột phá thành công! Cảnh giới: '+realmName());
-}else{
-s.qi=Math.floor(s.qi*.8);
-log('Đột phá thất bại! Mất 20% linh khí còn lại.');
+ let c=cost();
+ if(g.level>=10)c*=3;
+ if(g.qi<c){alert("Chưa đủ linh khí!");return}
+ let chance=g.level<=3?.05:g.level<=6?.15:g.level<=9?.30:.40;
+ g.qi-=c;
+ if(Math.random()<chance){
+  g.qi=Math.floor(g.qi*.8);
+  log("Đột phá thất bại, mất 20% linh khí còn lại.");
+ }else{
+  g.level++;g.potential+=3;g.hp=stats().maxHp;
+  if(g.level>10){g.level=1;g.realm=Math.min(g.realm+1,8);log("Đại cảnh giới đột phá thành công!")}
+  else log("Đột phá thành công! Nhận 3 điểm tiềm năng.");
+ }
+ save();render();
 }
-refresh();
+function spend(k){
+ if(g.potential<=0){alert("Không còn điểm tiềm năng!");return}
+ g.base[k]+=5;
+ if(k==="maxHp")g.hp+=5;
+ g.potential--;
+ log("Tăng "+k+" thêm 5.");
+ save();render();
 }
-
-function hunt(){
-if(Date.now()-s.lastHunt<30000)
-return log('Chưa hết hồi chiêu săn yêu.');
-
-s.lastHunt=Date.now();
-let i=Math.floor(Math.random()*4);
-s.frags[i]++;
-log('Nhận 1 mảnh rương '+['Hỏa','Băng','Lôi','Phong'][i]+'.');
-refresh();
+function hunt(i){
+ let m=mobs[i],s=stats(),hp=m.hp;
+ let rounds=0;
+ while(hp>0&&g.hp>0&&rounds++<30){
+  hp-=Math.max(1,s.atk+Math.floor(Math.random()*5));
+  if(hp>0)g.hp=Math.max(0,g.hp-Math.max(1,m.atk-s.def));
+ }
+ if(hp<=0){
+  g.qi+=m.qi;g.coins+=m.coin;g.hp=Math.min(s.maxHp,g.hp+10);
+  log("Chiến thắng "+m.name+"! Nhận "+m.qi+" linh khí, "+m.coin+" linh thạch.");
+ }else log("Thất bại! Hãy hồi phục rồi thử lại.");
+ save();render();
 }
-
-function craftChest(){
-let i=s.frags.findIndex(v=>v>=10);
-if(i<0)return log('Cần 10 mảnh cùng loại để ghép rương.');
-
-s.frags[i]-=10;
-
-let roll=Math.random();
-let idx=roll<.5?0:roll<.75?1:roll<.9?2:roll<.97?3:4;
-let gear={slot:Math.floor(Math.random()*6),rarity:idx,level:1};
-
-s.gear[gear.slot]=gear;
-log('Mở rương nhận trang bị '+rarities[idx][0]+' phẩm!');
-refresh();
+function enterDungeon(){
+ g.floor=1;g.enemyHp=enemyHP(1);
+ log("Bước vào bí cảnh tầng 1.");render();
 }
-
-function rollGear(slot){
-let r=Math.random();
-let rarity=r<.5?0:r<.75?1:r<.9?2:r<.97?3:4;
-return {slot,rarity,level:1};
-}
-
-function buyGear(slot){
-let g=rollGear(slot);
-let price=rarities[g.rarity][2];
-
-if(s.stones<price)
-return log('Không đủ linh thạch để mua trang bị.');
-
-s.stones-=price;
-s.gear[slot]=g;
-log('Mua thành công '+slots[slot]+' '+rarities[g.rarity][0]+' phẩm.');
-refresh();
-}
-
-function gearText(g){
-return `${rarities[g.rarity][0]} phẩm · cấp ${g.level}`;
-}
-
-function enhance(i){
-let g=s.gear[i];
-if(!g)return;
-if(g.level>=10)return log('Trang bị đã đạt cấp tối đa!');
-
-let req=[1,3,6,8,10,12,15,18,20][g.level-1];
-let mat=g.level<5?'iron':'blackIron';
-
-if(s[mat]<req)
-return log('Thiếu '+req+' '+(mat==='iron'?'Hắc Thiết':'Huyền Thiết')+'.');
-
-s[mat]-=req;
-
-let chances=[1,.8,.65,.5,.35,.2,.15,.1,.04];
-let chance=chances[g.level-1]+(s.star>0?.05:0);
-if(s.star>0)s.star--;
-
-let protect=s.gem>0;
-if(protect)s.gem--;
-
-if(Math.random()<chance){
-g.level++;
-log('Cường hóa thành công! '+slots[i]+' lên cấp '+g.level+'.');
-}else{
-if(!protect)g.level=Math.max(1,g.level-1);
-log('Cường hóa thất bại! '+(protect?
-'Bảo Thạch bảo vệ cấp trang bị.':'Trang bị tụt 1 cấp.'));
-}
-refresh();
-}
-
-function buyMat(type){
-let price={iron:15,blackIron:30,star:100,gem:150}[type];
-
-if(s.stones<price)return log('Không đủ linh thạch.');
-
-s.stones-=price;
-s[type]+=type==='iron'||type==='blackIron'?5:1;
-log('Đã mua vật liệu.');
-refresh();
-}
-
+function enemyHP(f){return f%5===0?160+f*25:40+f*12}
 function fightDungeon(){
-if(s.hp<=0)return log('Bạn đã gục. Hãy rời bí cảnh để hồi sinh.');
-
-let f=s.floor;
-let boss=f%5===0;
-let atk=boss?(f===15?50:40):5+(f-1)*5;
-let enemyHp=boss?(f===15?500:200):10+(f-1)*5;
-let def=boss?(f===15?60:30):5+(f-1)*5;
-let power=15+(s.level-1)*2;
-let dmg=Math.max(1,power-def/2);
-
-enemyHp-=dmg;
-
-if(enemyHp<=0){
-s.stones+=boss?f:1;
-if(boss){
-s.iron+=f===5?3:f===10?10:15;
-s.blackIron+=f===10?5:f===15?10:0;
-s.star+=f===5?1:f===10?1:2;
-s.gem+=f===5?1:f===10?1:2;
+ if(!g.floor){alert("Hãy vào bí cảnh trước.");return}
+ let s=stats(),f=g.floor;
+ let enemyAtk=6+f*3;
+ while(g.enemyHp>0&&g.hp>0){
+  g.enemyHp-=Math.max(1,s.atk+Math.floor(Math.random()*5));
+  if(g.enemyHp>0)g.hp=Math.max(0,g.hp-Math.max(1,enemyAtk-s.def));
+ }
+ if(g.enemyHp<=0){
+  g.qi+=30+f*12;g.coins+=10+f*4;
+  log("Thắng tầng "+f+"! Nhận thưởng.");
+  if(f===15){g.floor=0;g.enemyHp=0;log("Phá đảo bí cảnh!")}
+  else{g.floor++;g.enemyHp=enemyHP(g.floor)}
+ }else log("Bạn đã gục ngã.");
+ save();render();
 }
-else s.iron++;
-
-log('Thắng tầng '+f+'! Nhận phần thưởng.');
-s.floor=Math.min(15,s.floor+1);
-
-if(f===15){
-s.floor=1;
-log('Chinh phục toàn bộ bí cảnh! Tầng được đặt lại.');
+function leaveDungeon(){g.floor=0;g.hp=stats().maxHp;save();render();log("Rời bí cảnh, hồi đầy HP.")}
+function faction(f){
+ g.faction=f;
+ g.base=f==="Tiên"?{atk:15,def:10,maxHp:140,spd:5,luck:0}:{atk:20,def:5,maxHp:130,spd:10,luck:5};
+ g.hp=g.base.maxHp;save();render();
 }
-}else{
-s.hp=Math.max(0,s.hp-atk);
-log('Quái còn '+enemyHp+' HP. Bạn bị đánh '+atk+' sát thương.');
-if(s.hp===0)log('Bạn đã gục! Hãy rời bí cảnh để hồi sinh.');
+function setGender(v){g.gender=v;log("Đã chọn nhân vật "+v)}
+function setAura(v){g.aura=v;render()}
+function customize(){
+ g.name=document.getElementById("nameInput").value||"Đạo hữu";
+ document.getElementById("avatar").textContent=g.gender==="Nam"?"🧘":"🧘‍♀️";
+ document.getElementById("avatar").style.color=g.aura;
+ log("Đã lưu tạo hình "+g.name+".");save();render();
 }
-refresh();
-}
-
-function leaveDungeon(){
-s.hp=s.maxHp;
-s.floor=1;
-log('Bạn trở về làng và hồi đầy HP. Trang bị được giữ nguyên.');
-refresh();
-}
-
-function refresh(){
-renderStats();
-save();
-
-let current=document.querySelector('.tabs button.active');
-if(current){
-let map={
-'Tu luyện':'home','Săn yêu':'hunt','Túi đồ':'bag',
-'Luyện khí':'smith','Cửa hàng':'shop','Bí cảnh':'dungeon'
-};
-tab(map[current.textContent]||'home');
-}
-}
-
-load();
-renderStats();
-tab('home');
-
-setInterval(()=>{
-s.qi+=1;
-renderStats();
-save();
-},1000);
+document.getElementById("nameInput").value=g.name;
+render();
 </script>
 </body>
-                                       </html>
+  </html>
+  
